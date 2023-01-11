@@ -24,6 +24,7 @@ function LevelMaker.generate(width, height)
 
     -- generatedKeys
     local keysGen = {}
+    local locksGen = {}
 
     -- insert blank tables into tiles for later access
     for x = 1, height do
@@ -161,39 +162,12 @@ function LevelMaker.generate(width, height)
                     }
                 )
 
-            elseif math.random(2) == 1 and #keysGen < 4 then
+            elseif math.random(10) == 1 and #keysGen < 4 then
+                insertKey(keysGen, objects, blockHeight, x)
 
-                function giveKey()
-                    local frame = math.random(4)
-                    for k, key in pairs(keysGen) do
-                        if frame == key.frame then
-                            frame = giveKey()
-                        end
-                    end
-                    
-                    return frame
-                end
-
-                keyFrame = giveKey()
-                newKey = GameObject{
-                    texture = 'keys',
-                    x = (x - 1) * TILE_SIZE,
-                    y = (blockHeight - 1) * TILE_SIZE,
-                    width = 16,
-                    height = 16,
-                    frame = keyFrame,
-                    collidable = false,
-                    consumable = true,
-                    onConsume = function(player, object)
-                        gSounds['pickup']:play()
-                        player.score = player.score + 100
-                    end
-                }
-
+            elseif math.random(1) == 1 and #locksGen < 4 then
+                insertLock(locksGen, objects, blockHeight, x)
                 
-                table.insert(keysGen, newKey)
-                table.insert(objects, newKey)
-            
             end
         end
     end
@@ -204,3 +178,70 @@ function LevelMaker.generate(width, height)
 end
 
 
+function insertKey(keysGen, objects, blockHeight, x)
+    function giveKey()
+        local frame = math.random(4)
+        for k, key in pairs(keysGen) do
+            if frame == key.frame then
+                frame = giveKey()
+            end
+        end
+        
+        return frame
+    end
+
+    keyFrame = giveKey()
+    newKey = GameObject{
+        texture = 'keys',
+        x = (x - 1) * TILE_SIZE,
+        y = (blockHeight - 1) * TILE_SIZE,
+        width = 16,
+        height = 16,
+        frame = keyFrame,
+        collidable = false,
+        consumable = true,
+        onConsume = function(player, object)
+            gSounds['pickup']:play()
+            player.score = player.score + 100
+        end
+    }
+
+    
+    table.insert(keysGen, newKey)
+    table.insert(objects, newKey)
+end
+
+
+function insertLock(locksGen, objects, blockHeight, x)
+    function giveLock()
+        -- locks are in the second row in the textures
+        local frame = math.random(5, 8)
+        for k, lock in pairs(locksGen) do
+            if frame == lock.frame then
+                frame = giveLock()
+            end
+        end
+        
+        return frame
+    end
+
+    lockFrame = giveLock()
+    newKey = GameObject{
+        texture = 'keys',
+        x = (x - 1) * TILE_SIZE,
+        y = (blockHeight - 1) * TILE_SIZE,
+        width = 16,
+        height = 16,
+        frame = lockFrame,
+        collidable = true,
+        consumable = false,
+        onCollide = function(player, object)
+            gSounds['pickup']:play()
+            player.score = player.score + 100
+        end
+    }
+
+    
+    table.insert(locksGen, newKey)
+    table.insert(objects, newKey)
+end

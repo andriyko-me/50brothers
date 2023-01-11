@@ -168,7 +168,7 @@ function LevelMaker.generate(width, height)
                 )
             
             -- inserting key
-            elseif math.random(10) == 1 and not keyAndLock['key'] then
+            elseif math.random(1) == 1 and not keyAndLock['key'] then
                 keyFrame = math.random(4)
                 newKey = GameObject{
                     texture = 'keys',
@@ -185,28 +185,45 @@ function LevelMaker.generate(width, height)
                     end
                 }
                 keyAndLock['key'] = newKey
-                print(keyAndLock['key'].frame)
+                
                 table.insert(objects, newKey)
             
             -- inserting lock
-            elseif math.random(4) == 1 and not keyAndLock['lock'] and keyAndLock['key'] then
-                
-                newLock = GameObject{
+            elseif math.random(1) == 1 and not keyAndLock['lock'] and keyAndLock['key'] then
+
+                newLock = GameObject{   
                     texture = 'keys',
                     x = (x - 1) * TILE_SIZE,
                     y = (blockHeight - 1) * TILE_SIZE,
                     width = 16,
                     height = 16,
                     -- problems with image
-                    frame = keyAndLock['key'],
-                    collidable = true,
+                    frame = keyAndLock['key'].frame + 4,
                     consumable = false,
-                    onCollide = function(player, object)
+                    -- check if
+                    collidable = true,
+                    solid = true,
+                    hit = false,
+
+                    onCollide = function(object)
                         gSounds['pickup']:play()
-                        player.score = player.score + 100
+                        flag = GameObject{
+                            texture = 'columns',
+                            x = 2 * TILE_SIZE,
+                            y = 3 * TILE_SIZE,
+                            width = 16,
+                            height = 48,
+                            frame = 1,
+                            consumable = false,
+                            collidable = true,
+                            solid = false,
+                            hit = false,
+                        }
+                        table.insert(objects, flag)
+
                     end
                 }
-                keyAndLock['key'] = newLock
+                keyAndLock['lock'] = newLock
                 table.insert(objects, newLock)
                 
             end

@@ -62,6 +62,22 @@ function GenerateTileSets(quads, setsX, setsY, sizeX, sizeY)
     return tilesets
 end
 
+function GenerateFlags(atlas, tilewidth, tileheight) 
+    sheetHeight = atlas:getHeight() / tileheight
+    sheetWidth = atlas:getWidth() / tilewidth
+
+    local spritesheet = {}
+
+    for y = 1, sheetHeight - 1 do
+        table.insert(spritesheet, {})
+        for x = 7, sheetWidth - 1 do
+            spritesheet[y][x - 6] = 
+                love.graphics.newQuad(x * tilewidth, y * tileheight, 
+                tilewidth, tileheight, atlas:getDimensions())
+        end
+    end
+
+end
 --[[
     Recursive table printing function.
     https://coronalabs.com/blog/2014/09/02/tutorial-printing-table-contents/
